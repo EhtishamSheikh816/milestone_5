@@ -18,9 +18,6 @@ document
     const skillsElement = document.getElementById(
       "skills"
     ) as HTMLTextAreaElement;
-    const usernameElement = document.getElementById(
-      "username"
-    ) as HTMLInputElement;
 
     if (
       profilePicInput &&
@@ -29,8 +26,7 @@ document
       phoneElement &&
       educationElement &&
       experienceElement &&
-      skillsElement &&
-      usernameElement
+      skillsElement
     ) {
       const name = nameElement.value;
       const email = emailElement.value;
@@ -38,9 +34,6 @@ document
       const education = educationElement.value;
       const experience = experienceElement.value;
       const skills = skillsElement.value;
-      const username = usernameElement.value;
-      const uniquePath = `Resumes/${username.replace(/\s+/g, "_")}_CV.html`;
-
       const profilePicFile = profilePicInput.files?.[0];
       const profilePicURL = profilePicFile
         ? URL.createObjectURL(profilePicFile)
@@ -63,19 +56,41 @@ ${
 <p>${skills}</p>
 `;
 
-      const downloadLink = document.createElement("a");
-      downloadLink.href =
-        "data:text/html;charset-utf-8," + encodeURIComponent(resumeOutput);
-      downloadLink.download = uniquePath;
-      downloadLink.textContent = "Download Resume";
-
       const resumeOutputElement = document.getElementById("resumeOutput");
       if (resumeOutputElement) {
         resumeOutputElement.innerHTML = resumeOutput;
-        resumeOutputElement.appendChild(downloadLink);
-        resumeOutputElement.style.display = "block";
+        resumeOutputElement.classList.remove("hidden");
+
+        const buttonsContainer = document.createElement("div");
+        buttonsContainer.id = "buttonsContainer";
+        resumeOutputElement.appendChild(buttonsContainer);
+
+        const downloadButton = document.createElement("button");
+        downloadButton.textContent = "Download as PDF";
+        downloadButton.addEventListener("click", () => {
+          window.print;
+        });
+        buttonsContainer.appendChild(downloadButton);
+
+        const shareLinkButton = document.createElement("button");
+        shareLinkButton.textContent = "Copy Shareable Link";
+        shareLinkButton.addEventListener("click", async () => {
+          try {
+            const ShareableLink =
+              'https://yourdomain.com/resumes/${name.replace(/s+/g,"_")}_cv.html';
+
+            await navigator.clipboard.writeText(ShareableLink);
+            alert("Shareable link copied to clipboard!");
+          } catch (err) {
+            console.error("Failed to copy link: ", err);
+            alert("Failed to copy link to clipboard. Please try again. ");
+          }
+        });
+        buttonsContainer.appendChild(shareLinkButton);
       } else {
-        console.error("One or more form elements are missing");
+        console.error("Resume output container not found");
       }
+    } else {
+      console.error("Forms element are missing");
     }
   });
